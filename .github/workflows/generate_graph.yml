@@ -25,7 +25,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pandas matplotlib
+        pip install pandas plotly
 
     - name: Generate language graph
       run: python scripts/generate_language_graph.py
@@ -36,7 +36,7 @@ jobs:
       run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add images/languages_per_year.svg
+          git add images/languages_per_decade.html images/languages_per_decade_data.json review_languages.md
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update language graph")
           git push
 

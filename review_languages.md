@@ -4,7 +4,28 @@
 Ce document présente un aperçu des langages de programmation, y compris des statistiques sur leur création au fil des années.
 
 ## Graphique des langages par ans
-![Nombre de nouveau langage par ans](images/languages_per_year.svg)
+<div id="languageGraph"></div>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+fetch('images/languages_per_decade_data.json')
+    .then(response => response.json())
+    .then(data => {
+        var trace = {
+            x: data.x,
+            y: data.y,
+            type: 'bar'
+        };
+
+        var layout = {
+            title: 'Nombre de langages créés par décennie',
+            xaxis: {title: 'Décennie de création'},
+            yaxis: {title: 'Nombre de langages'}
+        };
+
+        Plotly.newPlot('languageGraph', [trace], layout);
+    });
+</script>
 
 [Source des données](/Benchmark_Languages.md)
 
