@@ -25,20 +25,62 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pandas plotly
+        pip install pandas plotly chart_studio
 
-    - name: Generate language graph
+    - name: Generate language graph data
       run: python scripts/generate_language_graph.py
+
+    - name: Upload to Plotly Chart Studio
+      env:
+        PLOTLY_USERNAME: ${{ secrets.PLOTLY_USERNAME }}
+        PLOTLY_API_KEY: ${{ secrets.PLOTLY_API_KEY }}
+      run: |
+        python - <<EOF
+        import chart_studio
+        import chart_studio.plotly as py
+        import chart_studio.tools as tls
+        import json
+        import plotly.graph_objects as go
+        
+        chart_studio.tools.set_credentials_file(username='$PLOTLY_USERNAME', api_key='$PLOTLY_API_KEY')
+        
+        with open('data/languages_per_decade_data.json', 'r') as f:
+            data = json.load(f)
+        
+        fig = go.Figure(data=[go.Bar(x=data['x'], y=data['y'])])
+        fig.update_layout(
+            title='Nombre de langages créés par décennie',
+            xaxis_title='Décennie de création',
+            yaxis_title='Nombre de langages'
+        )
+        
+        url = py.plot(fig, filename='languages_per_decade', auto_open=False)
+        print(f"PLOTLY_URL={url}")
+        EOF
+
+    - name: Update Markdown with Plotly URL
+      run: |
+        PLOTLY_URL=$(python - <<EOF
+        import chart_studio
+        import chart_studio.plotly as py
+        chart_studio.tools.set_credentials_file(username='${{ secrets.PLOTLY_USERNAME }}', api_key='${{ secrets.PLOTLY_API_KEY }}')
+        url = py.get_plot('languages_per_decade')
+        print(url)
+        EOF
+        )
+        sed -i '/## Graphique des langages par décennie/,/^$/d' review_languages.md
+        echo -e "\n## Graphique des langages par décennie\n" >> review_languages.md
+        echo -e "<iframe width="900" height="500" frameborder="0" scrolling="no" src="${PLOTLY_URL}.embed"></iframe>\n" >> review_languages.md
 
     - name: Commit and push changes
       env:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
       run: |
-         git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add data/languages_per_decade_data.json review_languages.md
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update language data")
-          git push
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add data/languages_per_decade_data.json review_languages.md
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update language data and graph")
+        git push
 
     - name: Check for conflicts
       if: failure()
