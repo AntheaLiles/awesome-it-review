@@ -30,7 +30,7 @@ jobs:
     - name: Generate language graph data
       run: python scripts/generate_language_graph.py
 
-    - name: Upload to Plotly Chart Studio
+    - name: Upload to Plotly Chart Studio and Update Markdown
       env:
         PLOTLY_USERNAME: ${{ secrets.PLOTLY_USERNAME }}
         PLOTLY_API_KEY: ${{ secrets.PLOTLY_API_KEY }}
@@ -56,21 +56,16 @@ jobs:
         
         url = py.plot(fig, filename='languages_per_decade', auto_open=False)
         print(f"PLOTLY_URL={url}")
+        
+        with open('review_languages.md', 'r') as f:
+            content = f.read()
+        
+        new_content = content.split('## Graphique des langages par décennie')[0]
+        new_content += f"\n## Graphique des langages par décennie\n\n<iframe width='900' height='500' frameborder='0' scrolling='no' src='{url}.embed'></iframe>\n"
+        
+        with open('review_languages.md', 'w') as f:
+            f.write(new_content)
         EOF
-
-    - name: Update Markdown with Plotly URL
-      run: |
-        PLOTLY_URL=$(python - <<EOF
-        import chart_studio
-        import chart_studio.plotly as py
-        chart_studio.tools.set_credentials_file(username='${{ secrets.PLOTLY_USERNAME }}', api_key='${{ secrets.PLOTLY_API_KEY }}')
-        url = py.get_plot('languages_per_decade')
-        print(url)
-        EOF
-        )
-        sed -i '/## Graphique des langages par décennie/,/^$/d' review_languages.md
-        echo -e "\n## Graphique des langages par décennie\n" >> review_languages.md
-        echo -e "<iframe width="900" height="500" frameborder="0" scrolling="no" src="${PLOTLY_URL}.embed"></iframe>\n" >> review_languages.md
 
     - name: Commit and push changes
       env:
