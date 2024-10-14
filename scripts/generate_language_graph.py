@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import ast
+import os
 
 def generate_language_graph():
     # Lire le CSV
@@ -16,6 +17,9 @@ def generate_language_graph():
     plt.xlabel('Année de création')
     plt.ylabel('Nombre de langages')
     plt.tight_layout()
+    
+    # Créer le dossier 'images' s'il n'existe pas
+    os.makedirs('images', exist_ok=True)
     
     # Sauvegarder le graphique
     plt.savefig('images/languages_per_year.svg', format='svg')

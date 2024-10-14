@@ -28,13 +28,22 @@ jobs:
     - name: Generate language graph
       run: python scripts/generate_language_graph.py
 
+    - name: Update Markdown
+      run: |
+        if [ -f "review_languages.md" ]; then
+          sed -i '/## Graphique des langages par année/,/^$/d' review_languages.md
+          echo -e "\n## Graphique des langages par année\n\n![Langages par année](images/languages_per_year.svg)\n" >> review_languages.md
+        else
+          echo -e "# Revue des langages de programmation\n\n## Graphique des langages par année\n\n![Langages par année](images/languages_per_year.svg)\n" > review_languages.md
+        fi
+
     - name: Commit and push changes
       env:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add images/languages_per_year.png review_languages.md
+        git add images/languages_per_year.svg review_languages.md
         git diff --quiet && git diff --staged --quiet || (git commit -m "Update language graph and Markdown")
         git pull --rebase origin main
         git push origin main
