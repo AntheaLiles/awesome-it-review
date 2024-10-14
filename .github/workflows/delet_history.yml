@@ -1,0 +1,63 @@
+name: Delete old workflow runs
+
+on:
+  workflow_dispatch:  # Permet l'exécution manuelle
+
+jobs:
+  del_runs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install moment
+        run: npm install moment
+
+      - name: Delete old workflow runs
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const moment = require('moment');
+            const retainDays = 30;
+            const keepMinimumRuns = 6;
+            
+            const workflows = await github.rest.actions.listRepoWorkflows({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            
+            for (const workflow of workflows.data.workflows) {
+              const runs = await github.paginate(github.rest.actions.listWorkflowRuns, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: workflow.id,
+                per_page: 100
+              });
+              
+              const sortedRuns = runs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+              const runsToDelete = sortedRuns.slice(keepMinimumRuns);
+              
+              for (const run of runsToDelete) {
+                const runDate = moment(run.created_at);
+                const daysOld = moment().diff(runDate, 'days');
+                
+                if (daysOld > retainDays) {
+                  try {
+                    await github.rest.actions.deleteWorkflowRun({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      run_id: run.id
+                    });
+                    console.log(`Deleted workflow run ${run.id} from ${runDate.format('YYYY-MM-DD')}`);
+                  } catch (error) {
+                    console.error(`Failed to delete run ${run.id}: ${error}`);
+                  }
+                }
+              }
+            }

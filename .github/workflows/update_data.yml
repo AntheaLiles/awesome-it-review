@@ -1,0 +1,59 @@
+name: Update Grist Data
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Exécute tous les jours à minuit
+  workflow_dispatch:  # Permet l'exécution manuelle
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.actor != 'github-actions[bot]'
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.ACTIONS_TOKEN }}
+        fetch-depth: 0  # Récupère tout l'historique pour un merge correct
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas requests PyGithub
+    
+    - name: Run update script
+      env:
+        GRIST_API_KEY: ${{ secrets.GRIST_API_KEY }}
+        GRIST_DOC_ID: ${{ secrets.GRIST_DOC_ID }}
+        ACTIONS_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
+      run: python update_grist_data.py
+    
+    - name: Convert CSV to Markdown
+      run: python csv_to_markdown.py
+    
+    - name: Commit and push changes
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update data from Grist and generate Markdown")
+        git pull --rebase origin main
+        git push origin main
+
+    - name: Check for conflicts
+      if: failure()
+      run: |
+        if git status | grep -q "You have unmerged paths"; then
+          echo "Merge conflicts detected. Please resolve manually."
+          exit 1
+        fi
