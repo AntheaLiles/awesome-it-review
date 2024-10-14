@@ -1,11 +1,11 @@
 name: Generate Language Graph
 
 on:
-  workflow_dispatch:
   workflow_run:
     workflows: ["Update Grist Data"]
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   generate-graph:
