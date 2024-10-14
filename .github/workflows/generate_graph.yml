@@ -1,0 +1,51 @@
+name: Generate Language Graph
+
+on:
+  workflow_run:
+    workflows: ["Update Grist Data"]
+    types:
+      - completed
+
+jobs:
+  generate-graph:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas matplotlib
+
+    - name: Generate language graph
+      run: python generate_language_graph.py
+
+    - name: Update Markdown
+      run: python update_markdown.py
+
+    - name: Commit and push changes
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add images/languages_per_year.png review_languages.md
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update language graph and Markdown")
+        git pull --rebase origin main
+        git push origin main
+
+    - name: Check for conflicts
+      if: failure()
+      run: |
+        if git status | grep -q "You have unmerged paths"; then
+          echo "Merge conflicts detected. Please resolve manually."
+          exit 1
+        fi

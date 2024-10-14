@@ -28,10 +28,13 @@ def csv_to_markdown(csv_file):
     return markdown
 
 def process_csv_files():
-    for file in os.listdir('.'):
+    data_dir = 'data'  # Dossier contenant les fichiers CSV
+    for file in os.listdir(data_dir):
         if file.endswith('.csv'):
-            markdown_content = csv_to_markdown(file)
-            with open(f"{os.path.splitext(file)[0]}.md", 'w', encoding='utf-8') as md_file:
+            csv_path = os.path.join(data_dir, file)
+            markdown_content = csv_to_markdown(csv_path)
+            md_file_path = f"{os.path.splitext(file)[0]}.md"
+            with open(md_file_path, 'w', encoding='utf-8') as md_file:
                 md_file.write(markdown_content)
 
 if __name__ == "__main__":
