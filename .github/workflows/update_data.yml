@@ -34,10 +34,10 @@ jobs:
         GRIST_API_KEY: ${{ secrets.GRIST_API_KEY }}
         GRIST_DOC_ID: ${{ secrets.GRIST_DOC_ID }}
         ACTIONS_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
-      run: python update_grist_data.py
+      run: python scripts/update_grist_data.py
     
     - name: Convert CSV to Markdown
-      run: python csv_to_markdown.py
+      run: python scripts/csv_to_markdown.py
     
     - name: Commit and push changes
       env:

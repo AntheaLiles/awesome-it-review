@@ -26,10 +26,7 @@ jobs:
         pip install pandas matplotlib
 
     - name: Generate language graph
-      run: python generate_language_graph.py
-
-    - name: Update Markdown
-      run: python update_markdown.py
+      run: python scripts/generate_language_graph.py
 
     - name: Commit and push changes
       env:
