@@ -21,7 +21,7 @@ def generate_language_graph():
     # Créer le dossier 'images' s'il n'existe pas
     os.makedirs('images', exist_ok=True)
     
-    # Sauvegarder le graphique
+    # Sauvegarder le graphique en format SVG
     plt.savefig('images/languages_per_year.svg', format='svg')
     plt.close()
 
