@@ -40,7 +40,7 @@ def update_github_file(file_name, content):
             raise
 
 # Liste des tables à mettre à jour
-tables = ['Benchmark_Languages', 'Benchmark_Logiciels', 'Benchmark_Browsers']
+tables = ['Benchmark_Languages', 'Benchmark_Logiciels', 'Benchmark_Browsers', 'Benchmark_CLI', 'Benchmark_DBMS', 'Benchmark_FileFormats', 'Benchmark_FileSystem', 'Benchmark_Licences', 'Benchmark_OS', 'Benchmark_Ontologies', 'Benchmark_VisualParadigms', 'Benchmark_WidgetToolkit', 'Benchmark_WindowsManager', 'Benchmark_WorkingEnvironment']
 
 # Mise à jour des données pour chaque table
 for table in tables:
