@@ -14,29 +14,37 @@ jobs:
       ACTIONS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
+
       - name: Install Python dependencies
         run: |
-          pip install requests PyGithub
-      - name: Update SQLite database
+          pip install requests PyGithub pandas sqlalchemy graphviz
+
+      - name: Update SQLite database and generate schema
         run: |
-          cd $GITHUB_WORKSPACE
           python src/main.py
+
       - name: Set up Common Lisp
         uses: 40ants/setup-lisp@v2
         with:
-          asdf-system: cl-sqlite cl-who cl-dot
-      - name: Generate DB schema
-        run: |
-          sbcl --non-interactive \
-               --load src/generate_db_schema.lisp
+          asdf-system: cl-sqlite cl-who
+
+      - name: Cache Quicklisp dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.quicklisp
+          key: ${{ runner.os }}-quicklisp-${{ hashFiles('**/quicklisp.lisp') }}
+          restore-keys: |
+            ${{ runner.os }}-quicklisp-
+
       - name: Update Org files
         run: |
-          sbcl --non-interactive \
-               --load src/update_org_files.lisp
+          sbcl --non-interactive --load src/update_org_files.lisp
+
       - name: Commit and push changes
         run: |
           git config --local user.email "action@github.com"
