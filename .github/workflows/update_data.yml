@@ -22,7 +22,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install requests PyGithub pandas sqlalchemy graphviz
+          pip install requests PyGithub pandas sqlalchemy graphviz pydot
 
       - name: Update SQLite database and generate schema
         run: |
