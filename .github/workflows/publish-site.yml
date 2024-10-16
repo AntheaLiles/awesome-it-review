@@ -1,40 +1,61 @@
-name: Publish Site
+name: Deploy Hugo site to Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: ["main"]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Emacs
         uses: purcell/setup-emacs@master
         with:
           version: 28.2
       - name: Install ox-hugo
         run: |
-          emacs -Q --batch --eval "(progn (require 'package) (add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\") t) (package-initialize) (package-refresh-contents) (package-install 'ox-hugo))"
+          emacs -Q --batch --eval "(progn \
+            (require 'package) \
+            (add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\") t) \
+            (package-initialize) \
+            (package-refresh-contents) \
+            (package-install 'ox-hugo))"
       - name: Build site
         run: |
           emacs -Q --batch --eval "
             (progn
+              (require 'package)
+              (package-initialize)
               (require 'ox-hugo)
               (dolist (file (directory-files-recursively \"org\" \"\\.org$\"))
                 (with-current-buffer (find-file-noselect file)
                   (org-hugo-export-to-md))))"
-      - name: Set up Hugo
+      - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: 'latest'
           extended: true
       - name: Build Hugo site
         run: hugo --minify
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          path: ./public
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
