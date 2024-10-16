@@ -14,14 +14,25 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true  # Fetch Hugo themes (true OR recursive)
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+     
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: 'latest'
           extended: true
-      - name: Build Hugo site
+    
+      - name: Add hugo-book theme
+        run: | 
+          git submodule add https://github.com/alex-shpak/hugo-book themes/hugo-book
+
+      - name: Build site
         run: hugo --minify
+    
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
