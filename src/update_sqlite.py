@@ -17,7 +17,7 @@ def update_sqlite(all_data):
             fields = record['fields']
             placeholders = ', '.join(['?' for _ in fields])
             columns = ', '.join(fields.keys())
-            values = tuple(fields.values())
+            values = tuple(json.dumps(v) if isinstance(v, (dict, list)) else v for v in fields.values())
             
             insert_query = f"INSERT OR REPLACE INTO {table} ({columns}) VALUES ({placeholders})"
             cursor.execute(insert_query, values)
