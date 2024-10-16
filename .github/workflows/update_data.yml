@@ -20,9 +20,14 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz
+
       - name: Install Python dependencies
         run: |
-          pip install requests PyGithub pandas sqlalchemy graphviz pydot
+          pip install requests PyGithub pandas sqlalchemy pydot
 
       - name: Update SQLite database and generate schema
         run: |
