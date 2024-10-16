@@ -18,4 +18,5 @@ Ce document présente un aperçu des langages de programmation, y compris des st
 [[file:data/project.db][Source des données]]
 
 ** Conclusion
-Ce rapport fournit une vue d'ensemble des langages de programmation et leur évolution au fil des années. Les graphiques et les tableaux présentés ici aident à visualiser ces informations de manière claire et concise.
+Ce rapport fournit une vue d'ensemble des langages de programmation et leur évolution au fil des années. 
+Les graphiques et les tableaux présentés ici aident à visualiser ces informations de manière claire et concise.

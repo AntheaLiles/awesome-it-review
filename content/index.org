@@ -6,7 +6,7 @@
 
 ** Topics
 
-[[review-languages][Programming languages review]]
+[[file:doc/review-languages][Programming languages review]]
 
 ** Data Source
 
