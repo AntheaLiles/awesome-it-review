@@ -33,10 +33,13 @@ jobs:
 
       - name: Build site
         run: |
-          hugo mod init github.com/AntheaLiles/awesome-it-review
-          hugo mod get github.com/alex-shpak/hugo-book
+          if [ ! -f go.mod ]; then
+            hugo mod init github.com/AntheaLiles/awesome-it-review
+          fi
+          hugo mod get -u github.com/alex-shpak/hugo-book
           hugo mod tidy
           hugo --minify
+
     
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
