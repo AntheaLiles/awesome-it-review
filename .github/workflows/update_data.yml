@@ -1,5 +1,13 @@
 name: Update Data and Org Files
 
+  env:
+    GRIST_API_KEY: ${{ secrets.GRIST_API_KEY }}
+    GRIST_DOC_ID: ${{ secrets.GRIST_DOC_ID }}
+    ACTIONS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  run: |
+    cd $GITHUB_WORKSPACE
+    python src/main.py
+
 on:
   schedule:
     - cron: '0 0 * * *'
