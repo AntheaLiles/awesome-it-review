@@ -1,13 +1,5 @@
 name: Update Data and Org Files
 
-  env:
-    GRIST_API_KEY: ${{ secrets.GRIST_API_KEY }}
-    GRIST_DOC_ID: ${{ secrets.GRIST_DOC_ID }}
-    ACTIONS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  run: |
-    cd $GITHUB_WORKSPACE
-    python src/main.py
-
 on:
   schedule:
     - cron: '0 0 * * *'
@@ -16,6 +8,10 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
+    env:
+      GRIST_API_KEY: ${{ secrets.GRIST_API_KEY }}
+      GRIST_DOC_ID: ${{ secrets.GRIST_DOC_ID }}
+      ACTIONS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -26,7 +22,9 @@ jobs:
         run: |
           pip install requests PyGithub
       - name: Update SQLite database
-        run: python src/main.py
+        run: |
+          cd $GITHUB_WORKSPACE
+          python src/main.py
       - name: Set up Common Lisp
         uses: 40ants/setup-lisp@v2
         with:
