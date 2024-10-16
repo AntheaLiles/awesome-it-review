@@ -1,0 +1,17 @@
+#+TITLE: Home
+#+DATE: 2024-10-16
+#+DRAFT: false
+
+* Welcome to the Awesome IT Review
+
+** Topics
+
+[[/review-languages][Programming languages review]]
+
+** Data Source
+
+| State | Title | URL |
+|-------+-------+-----|
+| DONE  |       |     |
+| DOING |       |     |
+| TODO  |       |     |
