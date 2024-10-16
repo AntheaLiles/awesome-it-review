@@ -9,27 +9,28 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-      - name: Set up SBCL
-        uses: lispci/setup-sbcl@v1
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          pip install grist-api pandas plotly
-          sbcl --load src/install-dependencies.lisp
-      - name: Fetch Grist data
-        run: python src/update_grist_data.py
-      - name: Generate language graph data
-        run: python src/generate_language_graph.py
+          pip install requests PyGithub
       - name: Update SQLite database
-        run: python src/update_sqlite.py
+        run: python main.py
+      - name: Set up Common Lisp
+        uses: 40ants/setup-lisp@v2
+        with:
+          asdf-system: cl-sqlite cl-who cl-dot
       - name: Generate DB schema
-        run: sbcl --load src/generate_db_schema.lisp
+        run: |
+          sbcl --non-interactive \
+               --load src/generate_db_schema.lisp
       - name: Update Org files
-        run: sbcl --load src/update_org_files.lisp
+        run: |
+          sbcl --non-interactive \
+               --load src/update_org_files.lisp
       - name: Commit and push changes
         run: |
           git config --local user.email "action@github.com"

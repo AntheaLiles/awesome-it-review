@@ -1,21 +1,32 @@
 import sqlite3
-import pandas as pd
+import json
 import os
 
-def update_sqlite():
+def update_sqlite(all_data):
     conn = sqlite3.connect('data/project.db')
+    cursor = conn.cursor()
     
-    tables = ['Benchmark_Languages', 'Benchmark_Logiciels', 'Benchmark_Browsers', 'Benchmark_CLI', 'Benchmark_DBMS', 'Benchmark_FileFormats', 'Benchmark_FileSystem', 'Benchmark_Licences', 'Benchmark_OS', 'Benchmark_Ontologies', 'Benchmark_VisualParadigms', 'Benchmark_WidgetToolkit', 'Benchmark_WindowsManager', 'Benchmark_WorkingEnvironment']
+    for table, records in all_data.items():
+        # Créer la table si elle n'existe pas
+        if records:
+            columns = list(records[0].keys())
+            create_table_query = f"CREATE TABLE IF NOT EXISTS {table} ({', '.join([f'{col} TEXT' for col in columns])})"
+            cursor.execute(create_table_query)
+        
+        # Insérer ou mettre à jour les données
+        for record in records:
+            placeholders = ', '.join(['?' for _ in record])
+            columns = ', '.join(record.keys())
+            values = tuple(record.values())
+            
+            insert_query = f"INSERT OR REPLACE INTO {table} ({columns}) VALUES ({placeholders})"
+            cursor.execute(insert_query, values)
     
-    for table in tables:
-        csv_path = f'data/{table}.csv'
-        if os.path.exists(csv_path):
-            df = pd.read_csv(csv_path)
-            df.to_sql(table, conn, if_exists='replace', index=False)
-        else:
-            print(f"Warning: {csv_path} not found")
-    
+    conn.commit()
     conn.close()
+    print("SQLite database updated successfully")
 
 if __name__ == "__main__":
-    update_sqlite()
+    # Ce bloc ne sera exécuté que si le script est exécuté directement
+    # et non pas importé comme un module
+    pass
