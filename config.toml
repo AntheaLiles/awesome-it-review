@@ -7,3 +7,17 @@ theme = "hugo-book"
   BookTheme = 'auto'
   BookToC = true
   BookSection = 'docs'
+
+[markup]
+  [markup.tableOfContents]
+    endLevel = 3
+    ordered = false
+    startLevel = 2
+  [markup.highlight]
+    style = "monokai"
+  [markup.goldmark.renderer]
+    unsafe = true
+  [markup.org]
+    # Activer le support Org mode
+    enable = true
+    # Vous pouvez ajouter d'autres options spécifiques à Org mode ici
