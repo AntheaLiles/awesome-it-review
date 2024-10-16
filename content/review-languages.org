@@ -1,3 +1,7 @@
+#+TITLE: Évolution des langages de programmation
+#+DATE: 2024-10-16
+#+DRAFT: false
+
 * Évolution des langages de programmation
 
 ** Introduction
@@ -11,7 +15,7 @@ Ce document présente un aperçu des langages de programmation, y compris des st
 #+END_SRC
 
 
-[[/data/project.db][Source des données]]
+[[file:data/project.db][Source des données]]
 
 ** Conclusion
 Ce rapport fournit une vue d'ensemble des langages de programmation et leur évolution au fil des années. Les graphiques et les tableaux présentés ici aident à visualiser ces informations de manière claire et concise.
