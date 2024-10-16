@@ -37,18 +37,26 @@ jobs:
         run: |
           curl -O https://beta.quicklisp.org/quicklisp.lisp
           sbcl --load quicklisp.lisp \
-               --eval '(quicklisp-quickstart:install)' \
+               --eval '(quicklisp-quickstart:install :path "~/quicklisp/")' \
                --eval '(ql:add-to-init-file)' \
                --eval '(ql:update-all-dists)' \
                --eval '(ql:quickload :cl-sqlite)' \
                --eval '(ql:quickload :cl-who)' \
                --eval '(quit)'
+          echo '(let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp" (user-homedir-pathname))))
+            (when (probe-file quicklisp-init)
+              (load quicklisp-init)))' > ~/.sbclrc
+
+      - name: Debug Quicklisp installation
+        run: |
+          ls -l ~/quicklisp
+          cat ~/.sbclrc
 
       - name: Update Org files
         run: |
           export PATH=$PATH:/usr/local/bin
           sbcl --non-interactive \
-               --load "~/quicklisp/setup.lisp" \
+               --load "$HOME/quicklisp/setup.lisp" \
                --eval '(ql:quickload :cl-sqlite)' \
                --eval '(ql:quickload :cl-who)' \
                --load src/update_org_files.lisp
