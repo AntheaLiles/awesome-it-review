@@ -1,6 +1,5 @@
 import sqlite3
 import json
-import os
 
 def update_sqlite(all_data):
     conn = sqlite3.connect('data/project.db')
@@ -9,15 +8,16 @@ def update_sqlite(all_data):
     for table, records in all_data.items():
         # Créer la table si elle n'existe pas
         if records:
-            columns = list(records[0].keys())
+            columns = list(records[0]['fields'].keys())
             create_table_query = f"CREATE TABLE IF NOT EXISTS {table} ({', '.join([f'{col} TEXT' for col in columns])})"
             cursor.execute(create_table_query)
         
         # Insérer ou mettre à jour les données
         for record in records:
-            placeholders = ', '.join(['?' for _ in record])
-            columns = ', '.join(record.keys())
-            values = tuple(record.values())
+            fields = record['fields']
+            placeholders = ', '.join(['?' for _ in fields])
+            columns = ', '.join(fields.keys())
+            values = tuple(fields.values())
             
             insert_query = f"INSERT OR REPLACE INTO {table} ({columns}) VALUES ({placeholders})"
             cursor.execute(insert_query, values)
