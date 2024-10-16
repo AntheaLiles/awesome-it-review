@@ -1,0 +1,40 @@
+name: Publish Site
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: 28.2
+      - name: Install ox-hugo
+        run: |
+          emacs -Q --batch --eval "(progn (require 'package) (add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\") t) (package-initialize) (package-refresh-contents) (package-install 'ox-hugo))"
+      - name: Build site
+        run: |
+          emacs -Q --batch --eval "
+            (progn
+              (require 'ox-hugo)
+              (dolist (file (directory-files-recursively \"org\" \"\\.org$\"))
+                (with-current-buffer (find-file-noselect file)
+                  (org-hugo-export-to-md))))"
+      - name: Set up Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'latest'
+          extended: true
+      - name: Build Hugo site
+        run: hugo --minify
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public

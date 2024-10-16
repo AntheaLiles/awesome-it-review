@@ -1,4 +1,0 @@
-id,fields
-1,"{'A': 'Bick Ontology', 'B': 'https://brickschema.org/', 'C': 'MEP', 'D': ''}"
-2,"{'A': 'Digital Construction Ontologies', 'B': 'https://digitalconstruction.github.io/v/0.5/index.html', 'C': '', 'D': ''}"
-3,"{'A': 'Digital Construction Lifecycle Ontology', 'B': 'https://w3id.org/digitalconstruction/0.5/Lifecycle#', 'C': '', 'D': 'BIM4EEB'}"

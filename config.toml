@@ -1,0 +1,9 @@
+baseURL = "https://anthealiles.github.io/awesome-it-review/"
+languageCode = "fr-fr"
+title = "Awesome IT Review"
+theme = "hugo-book"
+
+[params]
+  BookTheme = 'auto'
+  BookToC = true
+  BookSection = 'docs'

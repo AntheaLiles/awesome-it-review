@@ -12,8 +12,3 @@ Ce document présente un aperçu des langages de programmation, y compris des st
 
 ## Conclusion
 Ce rapport fournit une vue d'ensemble des langages de programmation et leur évolution au fil des années. Les graphiques et les tableaux présentés ici aident à visualiser ces informations de manière claire et concise.
-
-
-## Graphique des langages par décennie
-
-<iframe width='900' height='500' frameborder='0' scrolling='no' src='https://plotly.com/~AntheaLiles/1/.embed'></iframe>

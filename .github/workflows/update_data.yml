@@ -1,59 +1,39 @@
-name: Update Grist Data
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+name: Update Data and Org Files
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Exécute tous les jours à minuit
-  workflow_dispatch:  # Permet l'exécution manuelle
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
-  update-data:
+  update:
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.actor != 'github-actions[bot]'
     steps:
-    - uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.ACTIONS_TOKEN }}
-        fetch-depth: 0  # Récupère tout l'historique pour un merge correct
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pandas requests PyGithub
-    
-    - name: Run update script
-      env:
-        GRIST_API_KEY: ${{ secrets.GRIST_API_KEY }}
-        GRIST_DOC_ID: ${{ secrets.GRIST_DOC_ID }}
-        ACTIONS_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
-      run: python scripts/update_grist_data.py
-    
-    - name: Convert CSV to Markdown
-      run: python scripts/csv_to_markdown.py
-    
-    - name: Commit and push changes
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add .
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Update data from Grist and generate Markdown")
-        git pull --rebase origin main
-        git push origin main
-
-    - name: Check for conflicts
-      if: failure()
-      run: |
-        if git status | grep -q "You have unmerged paths"; then
-          echo "Merge conflicts detected. Please resolve manually."
-          exit 1
-        fi
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Set up SBCL
+        uses: lispci/setup-sbcl@v1
+      - name: Install dependencies
+        run: |
+          pip install grist-api pandas plotly
+          sbcl --load src/install-dependencies.lisp
+      - name: Fetch Grist data
+        run: python src/update_grist_data.py
+      - name: Generate language graph data
+        run: python src/generate_language_graph.py
+      - name: Update SQLite database
+        run: python src/update_sqlite.py
+      - name: Generate DB schema
+        run: sbcl --load src/generate_db_schema.lisp
+      - name: Update Org files
+        run: sbcl --load src/update_org_files.lisp
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data/ org/
+          git commit -m "Update data and Org files" || echo "No changes to commit"
+          git push
