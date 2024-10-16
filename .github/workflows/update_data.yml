@@ -33,20 +33,18 @@ jobs:
         run: |
           python src/main.py
 
-      - name: Cache Quicklisp dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.quicklisp
-          key: ${{ runner.os }}-quicklisp-${{ hashFiles('**/quicklisp.lisp') }}
-          restore-keys: |
-            ${{ runner.os }}-quicklisp-
+      - name: Install Quicklisp
+        run: |
+          curl -O https://beta.quicklisp.org/quicklisp.lisp
+          sbcl --load quicklisp.lisp --eval '(quicklisp-quickstart:install)' --eval '(ql:add-to-init-file)' --quit
 
       - name: Update Org files
         run: |
           export PATH=$PATH:/usr/local/bin
-          curl -O https://beta.quicklisp.org/quicklisp.lisp
-          sbcl --load quicklisp.lisp --eval '(quicklisp-quickstart:install)' --eval '(ql:add-to-init-file)' --quit
-          sbcl --non-interactive --load src/update_org_files.lisp
+          sbcl --non-interactive \
+               --eval '(ql:quickload :cl-sqlite)' \
+               --eval '(ql:quickload :cl-who)' \
+               --load src/update_org_files.lisp
 
       - name: Commit and push changes
         run: |
