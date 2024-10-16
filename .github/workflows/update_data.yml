@@ -39,16 +39,16 @@ jobs:
           sbcl --load quicklisp.lisp \
                --eval '(quicklisp-quickstart:install)' \
                --eval '(ql:add-to-init-file)' \
+               --eval '(ql:update-all-dists)' \
+               --eval '(ql:quickload :cl-sqlite)' \
+               --eval '(ql:quickload :cl-who)' \
                --eval '(quit)'
-          echo '(let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp" (user-homedir-pathname))))
-            (when (probe-file quicklisp-init)
-              (load quicklisp-init)))' > ~/.sbclrc
 
       - name: Update Org files
         run: |
           export PATH=$PATH:/usr/local/bin
           sbcl --non-interactive \
-               --eval '(load "~/quicklisp/setup.lisp")' \
+               --load "~/quicklisp/setup.lisp" \
                --eval '(ql:quickload :cl-sqlite)' \
                --eval '(ql:quickload :cl-who)' \
                --load src/update_org_files.lisp
