@@ -23,7 +23,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y graphviz
+          sudo apt-get install -y graphviz sbcl
 
       - name: Install Python dependencies
         run: |
@@ -48,6 +48,7 @@ jobs:
 
       - name: Update Org files
         run: |
+          export PATH=$PATH:/usr/local/bin
           sbcl --non-interactive --load src/update_org_files.lisp
 
       - name: Commit and push changes
