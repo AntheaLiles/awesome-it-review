@@ -17,21 +17,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          submodules: true  # Fetch Hugo themes (true OR recursive)
-          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+          submodules: true
+          fetch-depth: 0
      
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: 'latest'
           extended: true
-    
-      - name: Add hugo-book theme
-        run: | 
-          git submodule add https://github.com/alex-shpak/hugo-book themes/hugo-book
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
 
       - name: Build site
-        run: hugo --minify
+        run: |
+          hugo mod get -u
+          hugo --minify
     
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
