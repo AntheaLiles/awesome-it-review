@@ -5,7 +5,8 @@ title = "Awesome IT Review"
 [module]
   [[module.imports]]
     path = "github.com/alex-shpak/hugo-book"
-
+    disable = false
+    
 [params]
   BookTheme = 'auto'
   BookToC = true

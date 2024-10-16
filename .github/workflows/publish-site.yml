@@ -33,6 +33,7 @@ jobs:
 
       - name: Build site
         run: |
+          hugo mod init github.com/AntheaLiles/awesome-it-review
           hugo mod get -u
           hugo --minify
     
