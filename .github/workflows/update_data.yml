@@ -45,20 +45,21 @@ jobs:
                --eval '(ql:quickload "cl-sqlite")' \
                --eval '(ql:quickload "cl-who")' \
                --eval '(quit)'
+          echo '(let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp" (user-homedir-pathname))))
+            (when (probe-file quicklisp-init)
+              (load quicklisp-init)))' > ~/.sbclrc
 
       - name: Debug Quicklisp installation
         run: |
           ls -l ~/quicklisp
           cat ~/.sbclrc
+          sbcl --non-interactive --eval '(print (ql:quickload :cl-sqlite))' --quit
 
       - name: Update Org files
         run: |
           export PATH=$PATH:/usr/local/bin
           sbcl --non-interactive \
-               --load "$HOME/quicklisp/setup.lisp" \
-               --eval '(ql:quickload :sqlite)' \
-               --eval '(ql:quickload :cl-sqlite)' \
-               --eval '(ql:quickload :cl-who)' \
+               --load ~/.sbclrc \
                --load src/update_org_files.lisp
 
       - name: Commit and push changes
