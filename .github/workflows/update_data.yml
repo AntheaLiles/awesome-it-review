@@ -23,7 +23,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y graphviz sbcl
+          sudo apt-get install -y graphviz sbcl libsqlite3-dev
 
       - name: Install Python dependencies
         run: |
@@ -32,11 +32,6 @@ jobs:
       - name: Update SQLite database and generate schema
         run: |
           python src/main.py
-
-      - name: Set up Common Lisp
-        uses: 40ants/setup-lisp@v2
-        with:
-          asdf-system: cl-sqlite cl-who
 
       - name: Cache Quicklisp dependencies
         uses: actions/cache@v2
@@ -49,6 +44,8 @@ jobs:
       - name: Update Org files
         run: |
           export PATH=$PATH:/usr/local/bin
+          curl -O https://beta.quicklisp.org/quicklisp.lisp
+          sbcl --load quicklisp.lisp --eval '(quicklisp-quickstart:install)' --eval '(ql:add-to-init-file)' --quit
           sbcl --non-interactive --load src/update_org_files.lisp
 
       - name: Commit and push changes
