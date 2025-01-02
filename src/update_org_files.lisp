@@ -6,7 +6,7 @@
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
 
-(ql:quickload '(:cl-sqlite :cl-who))
+(ql:quickload '(:sqlite :cl-who))
 
 (defun update-org-files ()
   (let ((conn (sqlite:connect "data/project.db")))
